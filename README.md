@@ -85,6 +85,15 @@ gmail-to-sheets/
 
 ---
 
+## Bonus Features
+
+- Subject-based filtering to process only required emails
+- Retry logic with exponential backoff for Gmail and Sheets API calls
+- Logging with timestamps for better debugging
+- Limit of 10 recent unread emails per run for clean output
+
+---
+
 ## OAuth Flow Used
 The project uses OAuth 2.0 Desktop Application flow.
 On first run, a browser opens for Google login.
