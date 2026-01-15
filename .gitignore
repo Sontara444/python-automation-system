@@ -1,27 +1,42 @@
-credentials/
-__pycache__/
-*.pyc
-.env
-.DS_Store
-
-
+# =========================
 # Python
+# =========================
 venv/
 .venv/
 __pycache__/
 *.pyc
 
+# =========================
+# Environment files
+# =========================
+.env
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+
+# =========================
 # Logs
+# =========================
 *.log
 app.log
 
-# OAuth / State
-credentials/token.json
+# =========================
+# OAuth / Credentials
+# =========================
+credentials/
 credentials/credentials.json
+credentials/token.json
+
+# =========================
+# State file
+# =========================
 state.json
 
-# Debug / temp files
+# =========================
+# Debug / Temporary files
+# =========================
 diagnose_*.py
 check_*.py
 search_*.py
-

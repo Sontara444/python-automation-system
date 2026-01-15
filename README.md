@@ -1,81 +1,150 @@
-
 # Gmail to Google Sheets Automation
 
-A robust Python automation system that fetches unread emails from Gmail and logs them into a Google Sheet in reverse-chronological order.
+## Project Overview
+This project is a Python automation system that reads unread emails from a Gmail account
+using the Gmail API and saves them into a Google Sheet using the Google Sheets API.
 
-## 🏗️ High-Level Architecture
+Each email is stored with the following details:
+- From: Sender email address
+- Subject: Email subject
+- Date: Date and time received
+- Content: Email body in plain text
 
-```mermaid
-graph TD
-    A[Gmail Inbox] -->|Fetch Unread| B(Python Script);
-    B -->|Parse Content| C{Filters/Logic};
-    C -->|Reverse Order| D[Sheets Service];
-    D -->|Prepend at Row 2| E[Google Sheet];
-    E -->|Trim > 10 rows| E;
-    B -->|Persist ID| F[(state.json)];
-    B -->|Mark as Read| A;
-```
+The project uses OAuth 2.0 authentication and prevents duplicate entries.
 
-## 🚀 Setup Instructions
+---
 
-1.  **Clone the Repository**:
-    ```bash
-    git clone <repo-url>
-    cd gmail-to-sheets
-    ```
+## High-Level Architecture
+Gmail Inbox (Unread Emails)
+        |
+        | Gmail API (OAuth 2.0)
+        |
+Python Script
+        |
+        |-- Fetch unread emails
+        |-- Parse email data
+        |-- Save to Google Sheets
+        |
+Google Sheet
+        |
+state.json (stores processed email IDs)
 
-2.  **Install Dependencies**:
-    ```bash
-    python -m venv venv
-    source venv/bin/activate  # Windows: .\venv\Scripts\activate
-    pip install -r requirements.txt
-    ```
+---
 
-3.  **Google Cloud Setup**:
-    *   Enable **Gmail API** and **Google Sheets API** in the Google Cloud Console.
-    *   Initialize the **OAuth Consent Screen**.
-    *   Create **OAuth 2.0 Desktop Credentials** and download `credentials.json`.
-    *   Place `credentials.json` inside the `credentials/` folder.
+## Project Structure
 
-4.  **Configure**:
-    *   Open `config.py` and set your `SPREADSHEET_ID`.
+gmail-to-sheets/
+├── src/
+│   ├── gmail_service.py
+│   ├── sheets_service.py
+│   ├── email_parser.py
+│   └── main.py
+├── credentials/
+│   └── credentials.json (DO NOT COMMIT)
+├── proof/
+│   ├── gmail_unread_inbox.png
+│   ├── google_sheet_rows.png
+│   └── oauth_consent_screen.png
+├── state.json
+├── config.py
+├── requirements.txt
+├── .gitignore
+└── README.md
 
-5.  **Run**:
-    ```bash
-    python src/main.py
-    ```
+---
 
-## 🛠️ Technical Explanation
+## Setup Instructions
 
-### OAuth 2.0 Flow
-The system uses the **OAuth 2.0 Authorization Code Flow** for Desktop Apps. 
-- On first run, it opens a browser for user consent.
-- Upon approval, it receives an authorization code and exchanges it for **Access** and **Refresh** tokens.
-- Tokens are persisted in `credentials/token.json` for subsequent silent authentication.
+1. Clone the repository
+   git clone <repository-url>
+   cd gmail-to-sheets
 
-### Duplicate Prevention & State Persistence
-To avoid logging the same email twice, the script uses a **state-based tracking system**:
-- **Persistence**: Every processed `message_id` is stored in `state.json`.
-- **Logic**: Before processing an email, the script checks if the ID exists in the local set loaded from `state.json`. If it exists, the email is skipped.
-- **Safety**: IDs are added to the state *before* marking the email as read in Gmail, ensuring reliability.
+2. Create and activate virtual environment
+   python -m venv venv
+   Windows: .\venv\Scripts\Activate.ps1
 
-## 🏆 Challenges Faced
+3. Install dependencies
+   pip install -r requirements.txt
 
-**The "Ghost Table" Alignment Issue**:
-During initial deployment, new data was being appended to Row 228 instead of Row 2, despite the sheet appearing empty. 
-*   **Discovery**: Using the Sheets API metadata, I discovered a hidden "Table" object (`Applicant_Email_Log`) and "Banded Ranges" defined up to row 227. 
-*   **Solution**: I developed a specialized cleanup logic that programmatically deleted the Table and BandedRange objects, reset the grid properties, and re-initialized the headers. This allowed the `prepend` logic to work perfectly at Row 2.
+4. Google Cloud setup
+   - Enable Gmail API
+   - Enable Google Sheets API
+   - Configure OAuth consent screen
+   - Create OAuth Desktop credentials
+   - Download credentials.json
+   - Place it inside credentials/ folder
 
-## ⚠️ Limitations
-- **API Quotas**: Subject to Google's daily API rate limits.
-- **Local Runtime**: Currently designed to run as a local script; requires a server/cron for 24/7 automation.
-- **Single Sheet**: Configured specifically for 'Sheet1'.
+5. Configure Google Sheet
+   - Create a Google Sheet with headers:
+     From | Subject | Date | Content
+   - Copy Spreadsheet ID
+   - Add it in config.py
 
-## ✨ Optional & Bonus Features
-- **[BONUS] Subject-Based Filtering**: Filter emails in `config.py` by defining `EMAIL_SUBJECT_FILTER`.
-- **[BONUS] Logging**: Comprehensive logging in `app.log` and console.
-- **[EXTRA] Latest-on-Top Sorting**: Every run inserts the newest email into Row 2 (immediately after headers).
-- **[EXTRA] 10-Email Capacity**: The script automatically trims the sheet to keep only the 10 most recent entries.
+6. Run the project
+   python src/main.py
 
-## 👤 Author
-**Sontara**
+---
+
+## OAuth Flow Used
+The project uses OAuth 2.0 Desktop Application flow.
+On first run, a browser opens for Google login.
+After approval, access and refresh tokens are saved locally.
+Next runs use the saved token automatically.
+
+---
+
+## Duplicate Prevention Logic
+Each email has a unique message ID.
+After processing an email, its ID is stored in state.json.
+Before processing a new email, the script checks state.json.
+If the ID already exists, the email is skipped.
+This prevents duplicate rows in Google Sheets.
+
+---
+
+## State Persistence Method
+Processed email IDs are stored in a local file called state.json.
+This file is reused on every run.
+This approach is simple, reliable, and does not require a database.
+
+---
+
+## Challenge Faced
+OAuth access was blocked during testing.
+This happened because the app was in testing mode.
+The issue was fixed by adding the Gmail account as a test user
+in the OAuth consent screen settings.
+
+---
+
+## Limitations
+- Only unread emails are processed
+- Email content is stored as plain text
+- Uses local state.json file
+- Script runs manually
+
+---
+
+## Proof of Execution
+Screenshots are available in the proof folder:
+- Gmail inbox with unread emails
+- Google Sheet with at least 5 rows
+- OAuth consent screen
+
+---
+
+## Demo Video
+Video link:
+https://drive.google.com/file/d/1rfdR3PTnv6J8HWDF7A542rx4LVYes_ou/view?usp=sharing
+
+---
+
+## Security
+- credentials.json is not committed
+- OAuth tokens are ignored using .gitignore
+- No API keys are exposed
+
+---
+
+## Author
+Sontara 
