@@ -10,10 +10,10 @@ def parse_email(message):
     headers = payload.get('headers', [])
     
     data = {
-        'From': '',
-        'Subject': '',
-        'Date': '',
-        'Content': ''
+        'From': "",
+        'Subject': "",
+        'Date': "",
+        'Content': ""
     }
     
     for header in headers:
