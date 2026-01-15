@@ -76,3 +76,6 @@ During initial deployment, new data was being appended to Row 228 instead of Row
 - **[BONUS] Logging**: Comprehensive logging in `app.log` and console.
 - **[EXTRA] Latest-on-Top Sorting**: Every run inserts the newest email into Row 2 (immediately after headers).
 - **[EXTRA] 10-Email Capacity**: The script automatically trims the sheet to keep only the 10 most recent entries.
+
+## 👤 Author
+**Sontara**
